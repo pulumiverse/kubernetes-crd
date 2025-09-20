@@ -1,0 +1,3 @@
+[tools]
+go = '1.25.1'
+crd2pulumi = '1.5.4'
