@@ -1,2 +1,5 @@
-/_work/
-/poetry.lock
+# Binary create by code from `crd` folder
+/bin/crdk8s
+
+# IDE Specific project files
+/.idea
