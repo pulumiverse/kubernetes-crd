@@ -1,0 +1,1 @@
+".github/workflows/crd-publish.yaml": ".github/workflows/${crd}-publish.yaml"

@@ -1,30 +1,23 @@
-package templates
+package pkg
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
-
-	"gopkg.in/yaml.v3"
 )
 
 // helper to load a YAML file from testdata
-func loadYAMLConfig(t *testing.T, name string) Config {
+func loadYAMLConfig(t *testing.T, name string) *Config {
 	t.Helper()
 	path := filepath.Join("testdata", name)
-	b, err := os.ReadFile(path)
+	cfg, err := ReadConfig(path)
 	if err != nil {
-		t.Fatalf("failed reading %s: %v", path, err)
-	}
-	var cfg Config
-	if err := yaml.Unmarshal(b, &cfg); err != nil {
-		t.Fatalf("failed to unmarshal %s: %v", path, err)
+		t.Fatalf("failed to fetch config %s: %v", path, err)
 	}
 	return cfg
 }
 
 func TestUnmarshalSingle(t *testing.T) {
-	cfg := loadYAMLConfig(t, "sdks_single.yaml")
+	cfg := *loadYAMLConfig(t, "sdks_single.yaml")
 
 	if len(cfg) != 1 {
 		t.Fatalf("expected 1 CRD entry, got %d", len(cfg))
@@ -49,7 +42,7 @@ func TestUnmarshalSingle(t *testing.T) {
 }
 
 func TestUnmarshalMultiple(t *testing.T) {
-	cfg := loadYAMLConfig(t, "sdks_multiple.yaml")
+	cfg := *loadYAMLConfig(t, "sdks_multiple.yaml")
 
 	if len(cfg) != 2 {
 		t.Fatalf("expected 2 CRD entries, got %d", len(cfg))

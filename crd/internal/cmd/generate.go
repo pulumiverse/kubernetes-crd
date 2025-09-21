@@ -18,44 +18,26 @@ var generateCmd = &cobra.Command{
 	Use:   "generate",
 	Short: "Generate SDKs for given CRD.",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		//	config, err := pkg.LoadLocalConfig(generateArgs.ConfigPath)
-		//	if err != nil {
-		//		return err
-		//	}
-		//
-		//	// Template name priority: CLI flag > config file
-		//	if generateArgs.TemplateName == "" {
-		//		if config.Template != "" {
-		//			generateArgs.TemplateName = config.Template
-		//		}
-		//	}
-		//
-		//	// Name priority: CLI flag > config file ("repository", then "name" field)
-		//	if generateArgs.RepositoryName == "" {
-		//		if config.Repository != "" {
-		//			generateArgs.RepositoryName = config.Repository
-		//		} else {
-		//			providerName := config.Provider
-		//			organizationName := config.Organization
-		//			if providerName != "" && organizationName != "" {
-		//				generateArgs.RepositoryName = fmt.Sprintf("%s/pulumi-%s", organizationName, providerName)
-		//			}
-		//		}
-		//	}
-		//
-		//	if generateArgs.RepositoryName == "" {
-		//		return fmt.Errorf("repository name must be set either in the config file or via the --name flag")
-		//	}
-		//
-		//	err = pkg.GeneratePackage(pkg.GenerateOpts{
-		//		RepositoryName: generateArgs.RepositoryName,
-		//		OutDir:         generateArgs.OutDir,
-		//		TemplateName:   generateArgs.TemplateName,
-		//		Config:         config,
-		//		SkipMigrations: generateArgs.SkipMigrations,
-		//	})
-		//	return err
-		return nil
+		// Read the config file `sdks.yaml`
+		config, err := pkg.ReadConfig("sdks.yaml")
+		if err != nil {
+			return err
+		}
+		allCrds := *config
+
+		// Check the CRD name passed on the CLI
+		if generateArgs.CrdName == "" {
+			return fmt.Errorf("CRD name must be given via the -n/--name flag")
+		}
+
+		// Check if the given CRD name is configured in the config file
+		crd, found := allCrds[generateArgs.CrdName]
+		if !found {
+			return fmt.Errorf("CRD '%v' is not configured in `sdks.yaml` file", generateArgs.CrdName)
+		}
+
+		err = pkg.GenerateSDKs(generateArgs.CrdName, crd)
+		return err
 	},
 }
 
