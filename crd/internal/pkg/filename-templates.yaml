@@ -1,1 +1,2 @@
 ".github/workflows/crd-publish.yaml": ".github/workflows/${crd}-publish.yaml"
+"go.mod": "${crd}/go.mod"

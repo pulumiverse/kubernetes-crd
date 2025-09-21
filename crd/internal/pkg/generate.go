@@ -10,6 +10,17 @@ import (
 	"strings"
 )
 
+// kebabToPascal converts strings like "cert-manager" to "CertManager".
+func kebabToPascal(s string) string {
+	parts := strings.Split(s, "-")
+	for i, p := range parts {
+		if len(p) > 0 {
+			parts[i] = strings.ToUpper(p[:1]) + p[1:]
+		}
+	}
+	return strings.Join(parts, "")
+}
+
 func GenerateSDKs(name string, crd CRDDefinition) error {
 	// Clean up the folder for the CRD and recreate it
 	if err := os.RemoveAll(name); err != nil {
@@ -56,8 +67,10 @@ func generateFor(language string, name string, crd CRDDefinition) error {
 	languageOption := fmt.Sprintf("--%s", language)
 	packagePathOption := fmt.Sprintf("--%sPath", language)
 	packagePath := fmt.Sprintf("%s/%s", name, language)
+	packageNameOption := fmt.Sprintf("--%sName", language)
+	packageName := generatePackageName(name, language)
 
-	args := append([]string{languageOption, packagePathOption, packagePath}, crdFiles...)
+	args := append([]string{languageOption, packagePathOption, packagePath, packageNameOption, packageName}, crdFiles...)
 	fmt.Printf("crd2pulumi args: %v\n", args)
 	cmd := exec.Command("crd2pulumi", args...)
 
@@ -115,4 +128,19 @@ func downloadFile(filepath string, url string) error {
 	// Write the body to file
 	_, err = io.Copy(out, resp.Body)
 	return err
+}
+
+func generatePackageName(name string, language string) string {
+	packageName := name
+	switch language {
+	case "dotnet":
+		packageName = fmt.Sprintf("Kubernetes.Crd.%s", kebabToPascal(name))
+	case "go":
+		packageName = strings.Replace(name, "-", "", -1)
+	case "nodejs":
+		packageName = fmt.Sprintf("kubernetes-crd-%s", name)
+	case "python":
+		packageName = fmt.Sprintf("kubernetes_crd_%s", strings.Replace(name, "-", "_", -1))
+	}
+	return packageName
 }
