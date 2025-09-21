@@ -1,0 +1,12 @@
+# Multiple CRDs, and one CRD with multiple schema URLs
+cert-manager:
+  repository: https://github.com/cert-manager/cert-manager
+  version: 1.11.2
+  crd:
+    - https://github.com/cert-manager/cert-manager/releases/download/${VERSION}/cert-manager.crds.yaml
+external-dns:
+  repository: https://github.com/kubernetes-sigs/external-dns
+  version: 0.14.1
+  crd:
+    - https://raw.githubusercontent.com/kubernetes-sigs/external-dns/v${VERSION}/docs/contributing/crd-source/crd-release-1.yaml
+    - https://raw.githubusercontent.com/kubernetes-sigs/external-dns/v${VERSION}/docs/contributing/crd-source/crd-release-2.yaml
